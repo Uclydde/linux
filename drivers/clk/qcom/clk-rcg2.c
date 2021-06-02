@@ -844,6 +844,36 @@ const struct clk_ops clk_gfx3d_ops = {
 };
 EXPORT_SYMBOL_GPL(clk_gfx3d_ops);
 
+static int clk_gfx3d_single_determine_rate(struct clk_hw *hw,
+				    struct clk_rate_request *req)
+{
+	struct clk_hw **dynpll = to_clk_rcg2_gfx3d(hw)->hws;
+	int ret;
+
+	if (WARN_ON(!dynpll || !dynpll[0]))
+		return -EINVAL;
+
+	ret = clk_rcg2_determine_rate(hw, req);
+	if (ret < 0)
+		return ret;
+
+	if (req->best_parent_hw != dynpll[0])
+		req->best_parent_rate = clk_hw_get_rate(req->best_parent_hw);
+
+	return 0;
+}
+
+const struct clk_ops clk_gfx3d_single_ops = {
+	.is_enabled = clk_rcg2_is_enabled,
+	.get_parent = clk_rcg2_get_parent,
+	.set_parent = clk_rcg2_set_parent,
+	.recalc_rate = clk_rcg2_recalc_rate,
+	.set_rate = clk_rcg2_set_rate,
+	.set_rate_and_parent = clk_rcg2_set_rate_and_parent,
+	.determine_rate = clk_gfx3d_single_determine_rate,
+};
+EXPORT_SYMBOL_GPL(clk_gfx3d_single_ops);
+
 static int clk_rcg2_set_force_enable(struct clk_hw *hw)
 {
 	struct clk_rcg2 *rcg = to_clk_rcg2(hw);
