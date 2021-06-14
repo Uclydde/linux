@@ -7,6 +7,7 @@
 #include "pmi8950.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/leds/common.h>
+#include <dt-bindings/interrupt-controller/irq.h>
 
 / {
   model = "ali";
