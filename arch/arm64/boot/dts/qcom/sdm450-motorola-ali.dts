@@ -79,7 +79,7 @@
 &dsi0 {
 	panel: panel@0 {
 	 	// not sure which one of these two boe panels, so why not both:
-		compatible = "tianma,565-v0", "boe,565-v0", "boe,bs057y8m-n00-680g", "boe,bs057y8m-n00-6802", "qcom,mipi_mot_vid_tianma_1080p_565", "qcom,mdss_dsi_mot_tianma_565_1080p_vid_v0", "qcom,mdss_dsi_mot_dummy_qhd_video", "qcom,mipi_mot_video_dummy_qhd", "qcom,mot_tianma_565_1080p_vid_v0", "qcom,mdss-dsi-panel", "tianma,mipi_mot_vid_tianma_1080p_565", "tianma,mdss_dsi_mot_tianma_565_1080p_vid_v0", "tianma,mot_tianma_565_1080p_vid_v0";
+		compatible = "tianma,622-v0", "tianma,tl052vdxp02", "tianma,565-v0", "boe,565-v0", "boe,bs057y8m-n00-680g", "boe,bs052fhm-a00-6c01", "boe,bs057y8m-n00-6802", "qcom,mipi_mot_vid_tianma_1080p_565", "qcom,mdss_dsi_mot_tianma_565_1080p_vid_v0", "qcom,mdss_dsi_mot_dummy_qhd_video", "qcom,mipi_mot_video_dummy_qhd", "qcom,mot_tianma_565_1080p_vid_v0", "qcom,mdss-dsi-panel", "tianma,mipi_mot_vid_tianma_1080p_565", "tianma,mdss_dsi_mot_tianma_565_1080p_vid_v0", "tianma,mot_tianma_565_1080p_vid_v0";
 		
 		reg = <0>;
 		
