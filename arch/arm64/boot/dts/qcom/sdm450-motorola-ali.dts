@@ -1,0 +1,263 @@
+// SPDX-License-Identifier: GPL-2.0-only
+// Copyright (c) 2020, The Linux Foundation. All rights reserved.
+
+/dts-v1/;
+
+#include "msm8953-pm8953.dtsi"
+#include "pmi8950.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/leds/common.h>
+
+/ {
+  model = "ali";
+  compatible = "qcom,sdm450-ali", "qcom,sdm450-moto", "qcom,sdm450", "qcom,msm8953-moto", "qcom,msm8953", "lk2nd,device";
+  qcom,msm-id = <338 0>;
+  qcom,board-id = <0x41 0xb1a0 0x42 0xb1a0>, <0x43 0xc100>, <0x42 0xb1b0>, <0x43 0xc200 0x44 0xc200>, <0x42 0xb200 0x43 0xb200>;
+  
+  // TODO: is this alias necessary?
+  aliases {
+  	panel = &panel;
+  };
+  
+  // TODO: add led first
+  //backlight: backlight {
+	//compatible = "led-backlight";
+	//leds = <&led>;
+  //};
+  
+  
+  reserved-memory {
+	/delete-node/other_ext_region@85b00000;
+	
+	other_ext_region@84300000 {
+		no-map;
+		reg = <0x0 0x84300000 0x0 0x2000000>;
+	};
+	
+	ramoops_mem: ramoops_mem_region {
+		compatible = "ramoops";
+		reg = <0x0 0xef000000 0x0 0xC0000>;
+		console-size = <0x40000>;
+	};
+	
+	// NOTE: importantly, when the device was bootlooping, this node was here before, but didn't have the @eefe4000. same for wdog_cpuctx_region@eefe6000.
+	tzlog_bck_region@eefe4000 {
+		no-map;
+		reg = <0x0 0xeefe4000 0x0 0x2000>;
+	};
+
+	wdog_cpuctx_region@eefe6000 {
+		no-map;
+		reg = <0x0 0xeefe6000 0x0 0x1a000>;
+	};
+
+  };
+  
+  	gpio-keys {
+		compatible = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&gpio_key_default>;
+
+		label = "GPIO Button";
+
+		volume-up {
+			label = "Volume Up";
+			gpios = <&msmgpio 85 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_VOLUMEUP>;
+		};
+	};
+  
+};
+
+&atc_leds {
+	status = "okay";
+};
+
+
+&dsi0 {
+	panel: panel@0 {
+	 	// not sure which one of these two boe panels, so why not both:
+		compatible = "tianma,565-v0", "boe,565-v0", "boe,bs057y8m-n00-680g", "boe,bs057y8m-n00-6802", "qcom,mipi_mot_vid_tianma_1080p_565", "qcom,mdss_dsi_mot_tianma_565_1080p_vid_v0", "qcom,mdss_dsi_mot_dummy_qhd_video", "qcom,mipi_mot_video_dummy_qhd", "qcom,mot_tianma_565_1080p_vid_v0", "qcom,mdss-dsi-panel", "tianma,mipi_mot_vid_tianma_1080p_565", "tianma,mdss_dsi_mot_tianma_565_1080p_vid_v0", "tianma,mot_tianma_565_1080p_vid_v0";
+		
+		reg = <0>;
+		
+		// couldn't verify this downstream
+		// backlight = <&pmi8950_wled>; 
+		
+		// panel driver generator gave this, but we also need to set up the leds first:
+		//backlight = <&backlight>;
+		
+		// found these downstream and in similar devices
+		supply-names = "vsp", "vsn"; 
+		
+		// NOTE: vlab caused a build error. dont know why.
+		
+		// found these downstream and in similar devices
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&pmx_mdss_default>; 
+		pinctrl-1 = <&pmx_mdss_sleep>; 
+		
+		reset-gpios = <&msmgpio 61 GPIO_ACTIVE_LOW>; // similar devices have GPIO_ACTIVE_LOW, but downstream looks like it should be GPIO_ACTIVE_HIGH. TODO: investigate
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&dsi0_out>;
+			};
+		};
+	};
+};
+
+&dsi0_out {
+	data-lanes = <0 1 2 3>;
+	remote-endpoint = <&panel_in>;
+};
+
+&sdhc_1 {
+	status = "okay";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_clk_on &sdc1_cmd_on &sdc1_data_on  &sdc1_rclk_on>;
+	pinctrl-1 = <&sdc1_clk_off &sdc1_cmd_off &sdc1_data_off &sdc1_rclk_off>;
+};
+
+&sdhc_2 {
+	status = "okay";
+	
+	// found this downstream (and in similar non-motorola device trees)
+	cd-gpios = <&msmgpio 133 GPIO_ACTIVE_HIGH>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_clk_on &sdc2_cmd_on &sdc2_data_on &sdc2_cd_off>;
+	pinctrl-1 = <&sdc2_clk_off &sdc2_cmd_off &sdc2_data_off &sdc2_cd_off>;
+};
+
+
+&msmgpio {
+	gpio-reserved-ranges = <95 5>, <111 1>, <126 1>;
+	
+	ts_reset: ts-reset-pins {
+		pins = "gpio64";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-pull-up;
+	};
+	
+	touch_int_default: touch-int-default-pins {
+		pins = "gpio65";
+		function = "gpio";
+		bias-disable;
+	};
+
+	touch_int_suspend: touch-int-suspend-pins {
+		pins = "gpio65";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-pull-up;
+	};
+	
+	pmx_mdss_default: pmx-mdss-default-pins {
+		pins = "gpio61", "gpio59";
+		function = "gpio";
+		drive-strength = <8>;
+		bias-disable;
+		output-high;
+	};
+
+	pmx_mdss_sleep: pmx-mdss-sleep-pins {
+		pins = "gpio61", "gpio59";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-pull-down;
+	};
+	
+	// TODO: add the rest of the msmgpio's, like nfc
+};
+
+&usb3 {
+	status = "okay";
+};
+
+
+&smd_rpm_regulators {
+	s1 {
+		regulator-min-microvolt = <795000>;
+		regulator-max-microvolt = <1081000>;
+	};
+	s3 {
+		regulator-min-microvolt = <1225000>;
+		regulator-max-microvolt = <1225000>;
+	};
+	s4 {
+		regulator-min-microvolt = <1900000>;
+		regulator-max-microvolt = <2050000>;
+	};
+	l1 {
+		regulator-min-microvolt = <1000000>;
+		regulator-max-microvolt = <1100000>;
+	};
+	l2 {
+		regulator-min-microvolt = <975000>;
+		regulator-max-microvolt = <1225000>;
+	};
+	l3 {
+		regulator-min-microvolt = <925000>;
+		regulator-max-microvolt = <925000>;
+	};
+	l5 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+	l6 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+	l7 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1900000>;
+	};
+	l8 {
+		regulator-min-microvolt = <2900000>;
+		regulator-max-microvolt = <2900000>;
+	};
+	l9 {
+		regulator-min-microvolt = <3000000>;
+		regulator-max-microvolt = <3300000>;
+	};
+	l10 {
+		regulator-min-microvolt = <2850000>;
+		regulator-max-microvolt = <2850000>;
+	};
+	l11 {
+		regulator-min-microvolt = <2950000>;
+		regulator-max-microvolt = <2950000>;
+	};
+	l12 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <2950000>;
+	};
+	l13 {
+		regulator-min-microvolt = <3125000>;
+		regulator-max-microvolt = <3125000>;
+	};
+	l16 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+	l17 {
+		regulator-min-microvolt = <2850000>;
+		regulator-max-microvolt = <2850000>;
+	};
+	l19 {
+		regulator-min-microvolt = <1200000>;
+		regulator-max-microvolt = <1350000>;
+	};
+	l22 {
+		regulator-min-microvolt = <2800000>;
+		regulator-max-microvolt = <2850000>;
+	};
+	l23 {
+		regulator-min-microvolt = <975000>;
+		regulator-max-microvolt = <1225000>;
+	};
+};
