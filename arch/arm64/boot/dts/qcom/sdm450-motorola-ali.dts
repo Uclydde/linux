@@ -160,7 +160,8 @@
 	status = "okay";
 	
 	// found this downstream (and in similar non-motorola device trees)
-	cd-gpios = <&msmgpio 133 GPIO_ACTIVE_HIGH>;
+	// motorola-potter comments this out, so we will do it too, I guess :)
+	//cd-gpios = <&msmgpio 133 GPIO_ACTIVE_HIGH>;
 
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&sdc2_clk_on &sdc2_cmd_on &sdc2_data_on &sdc2_cd_off>;
