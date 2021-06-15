@@ -121,30 +121,7 @@
 	vdda-supply = <&pm8953_s3>;
 
 	ports {
-		port@0 {
-			reg = <0>;
-			csiphy0_ep: endpoint {
-				clock-lanes = <7>;
-				data-lanes = <0 1 2 3>;
-				remote-endpoint = <&rear_cam_ep>;
-			};
-		};
-		port@1 {
-			reg = <1>;
-			csiphy1_ep: endpoint {
-				clock-lanes = <7>;
-				data-lanes = <0 1 2 3>;
-				remote-endpoint = <&front_cam_ep>;
-			};
-		};
-		port@2 {
-			reg = <2>;
-			csiphy2_ep: endpoint {
-				clock-lanes = <7>;
-				data-lanes = <0 1>;
-				remote-endpoint = <&aux_cam_ep>;
-			};
-		};
+		// empty for now (TODO: fill in later)
 	};
 };
 
