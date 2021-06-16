@@ -77,43 +77,36 @@
 };
 
 
-&dsi0 {
-	panel: panel@0 {
-	 	// not sure which one of these two boe panels, so why not both:
-		compatible = "tianma,622-v0", "tianma,tl052vdxp02", "tianma,565-v0", "boe,565-v0", "boe,bs057y8m-n00-680g", "boe,bs052fhm-a00-6c01", "boe,bs057y8m-n00-6802", "qcom,mipi_mot_vid_tianma_1080p_565", "qcom,mdss_dsi_mot_tianma_565_1080p_vid_v0", "qcom,mdss_dsi_mot_dummy_qhd_video", "qcom,mipi_mot_video_dummy_qhd", "qcom,mot_tianma_565_1080p_vid_v0", "qcom,mdss-dsi-panel", "tianma,mipi_mot_vid_tianma_1080p_565", "tianma,mdss_dsi_mot_tianma_565_1080p_vid_v0", "tianma,mot_tianma_565_1080p_vid_v0";
-		
-		reg = <0>;
-		
-		// couldn't verify this downstream
-		// backlight = <&pmi8950_wled>; 
-		
-		// panel driver generator gave this, but we also need to set up the leds first:
-		//backlight = <&backlight>;
-		
-		// found these downstream and in similar devices
-		supply-names = "vsp", "vsn"; 
-		
-		// NOTE: vlab caused a build error. dont know why.
-		
-		// found these downstream and in similar devices
-		pinctrl-names = "default", "sleep";
-		pinctrl-0 = <&pmx_mdss_default>; 
-		pinctrl-1 = <&pmx_mdss_sleep>; 
-		
-		reset-gpios = <&msmgpio 61 GPIO_ACTIVE_LOW>; // similar devices have GPIO_ACTIVE_LOW, but downstream looks like it should be GPIO_ACTIVE_HIGH. TODO: investigate
+//&dsi0 {
+//	panel: panel@0 {
+//	 	// not sure which one of these two boe panels, so why not both:
+//		compatible = "tianma,622-v0", "tianma,tl052vdxp02", "tianma,565-v0", "boe,565-v0", "boe,bs057y8m-n00-680g", "boe,bs052fhm-a00-6c01", "boe,bs057y8m-n00-6802", "qcom,mipi_mot_vid_tianma_1080p_565", "qcom,mdss_dsi_mot_tianma_565_1080p_vid_v0", "qcom,mdss_dsi_mot_dummy_qhd_video", "qcom,mipi_mot_video_dummy_qhd", "qcom,mot_tianma_565_1080p_vid_v0", "qcom,mdss-dsi-panel", "tianma,mipi_mot_vid_tianma_1080p_565", "tianma,mdss_dsi_mot_tianma_565_1080p_vid_v0", "tianma,mot_tianma_565_1080p_vid_v0";
+//		
+//		reg = <0>;
+//		
+//		// found these downstream and in similar devices
+//		supply-names = "vsp", "vsn"; 
+//		
+//		
+//		// found these downstream and in similar devices
+//		pinctrl-names = "default", "sleep";
+//		pinctrl-0 = <&pmx_mdss_default>; 
+//		pinctrl-1 = <&pmx_mdss_sleep>; 
+//		
+//		reset-gpios = <&msmgpio 61 GPIO_ACTIVE_LOW>; // similar devices have GPIO_ACTIVE_LOW, but downstream looks like it should be GPIO_ACTIVE_HIGH. TODO: investigate
+//
+//		port {
+//			panel_in: endpoint {
+//				remote-endpoint = <&dsi0_out>;
+//			};
+//		};
+//	};
+//};
 
-		port {
-			panel_in: endpoint {
-				remote-endpoint = <&dsi0_out>;
-			};
-		};
-	};
-};
-
-&dsi0_out {
-	data-lanes = <0 1 2 3>;
-	remote-endpoint = <&panel_in>;
-};
+//&dsi0_out {
+	//data-lanes = <0 1 2 3>;
+	//remote-endpoint = <&panel_in>;
+//};
 
 &camss {
 	status = "okay";
