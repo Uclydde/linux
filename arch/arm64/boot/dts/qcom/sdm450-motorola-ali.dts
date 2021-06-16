@@ -198,8 +198,8 @@
 		regulator-max-microvolt = <1081000>;
 	};
 	s3 {
-		regulator-min-microvolt = <1225000>;
-		regulator-max-microvolt = <1225000>;
+		regulator-min-microvolt = <1224000>;
+		regulator-max-microvolt = <1224000>;
 	};
 	s4 {
 		regulator-min-microvolt = <1900000>;
