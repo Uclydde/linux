@@ -267,3 +267,11 @@
 		regulator-max-microvolt = <1225000>;
 	};
 };
+
+&framebuffer {
+	status = "okay";
+
+	width = <1080>;
+	height = <2160>;
+	stride = <(1080 * 3)>;
+};
