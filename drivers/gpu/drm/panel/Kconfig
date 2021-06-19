@@ -122,6 +122,13 @@ config DRM_PANEL_TIANMA_622_V0
 	tristate "Tianma 6.22\" inch panel"
 	select DRM_PANEL_MIPI_DSI_COMMON
 
+config DRM_PANEL_TIANMA_565_V0
+	tristate "Tianma 5.65\" panel" 
+	select DRM_PANEL_MIPI_DSI_COMMON
+	help 	  
+	  Say Y here if you want to enable support for the Tianma
+	  2160x1080 5.65" panel (found on the Motorola Moto G6)
+
 config DRM_PANEL_ELIDA_KD35T133
 	tristate "Elida KD35T133 panel driver"
 	depends on OF
