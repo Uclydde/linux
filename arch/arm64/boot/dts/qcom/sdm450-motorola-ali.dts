@@ -16,15 +16,9 @@
   qcom,board-id = <0x41 0xb1a0 0x42 0xb1a0>, <0x43 0xc100>, <0x42 0xb1b0>, <0x43 0xc200 0x44 0xc200>, <0x42 0xb200 0x43 0xb200>;
   
   // TODO: is this alias necessary?
-  //aliases {
-  //	panel = &panel;
-  //};
-  
-  // TODO: add led first
-  //backlight: backlight {
-	//compatible = "led-backlight";
-	//leds = <&led>;
-  //};
+  aliases {
+  	panel = &panel;
+  };
   
   
   reserved-memory {
@@ -76,37 +70,50 @@
 	status = "okay";
 };
 
+&pmi8950_wled {
+	status = "okay";
 
-//&dsi0 {
-//	panel: panel@0 {
-//	 	// not sure which one of these two boe panels, so why not both:
-//		compatible = "tianma,622-v0", "tianma,tl052vdxp02", "tianma,565-v0", "boe,565-v0", "boe,bs057y8m-n00-680g", "boe,bs052fhm-a00-6c01", "boe,bs057y8m-n00-6802", "qcom,mipi_mot_vid_tianma_1080p_565", "qcom,mdss_dsi_mot_tianma_565_1080p_vid_v0", "qcom,mdss_dsi_mot_dummy_qhd_video", "qcom,mipi_mot_video_dummy_qhd", "qcom,mot_tianma_565_1080p_vid_v0", "qcom,mdss-dsi-panel", "tianma,mipi_mot_vid_tianma_1080p_565", "tianma,mdss_dsi_mot_tianma_565_1080p_vid_v0", "tianma,mot_tianma_565_1080p_vid_v0";
-//		
-//		reg = <0>;
-//		
-//		// found these downstream and in similar devices
-//		supply-names = "vsp", "vsn"; 
-//		
-//		
-//		// found these downstream and in similar devices
-//		pinctrl-names = "default", "sleep";
-//		pinctrl-0 = <&pmx_mdss_default>; 
-//		pinctrl-1 = <&pmx_mdss_sleep>; 
-//		
-//		reset-gpios = <&msmgpio 61 GPIO_ACTIVE_LOW>; // similar devices have GPIO_ACTIVE_LOW, but downstream looks like it should be GPIO_ACTIVE_HIGH. TODO: investigate
-//
-//		port {
-//			panel_in: endpoint {
-//				remote-endpoint = <&dsi0_out>;
-//			};
-//		};
-//	};
-//};
+	/* Don't copy-paste! See pmi8950.dtsi */
 
-//&dsi0_out {
-	//data-lanes = <0 1 2 3>;
-	//remote-endpoint = <&panel_in>;
-//};
+	qcom,current-limit-microamp = <25000>;
+	qcom,enabled-strings = <0 1 2>;
+	qcom,num-strings = <3>;
+
+	qcom,cabc;
+	qcom,eternal-pfet;
+};
+
+&dsi0 {
+	panel: panel@0 {
+		compatible = "tianma,565-v0", "qcom,mipi_mot_vid_tianma_1080p_565", "qcom,mdss_dsi_mot_tianma_565_1080p_vid_v0", "qcom,mdss_dsi_mot_dummy_qhd_video", "qcom,mipi_mot_video_dummy_qhd", "qcom,mot_tianma_565_1080p_vid_v0", "qcom,mdss-dsi-panel", "tianma,mipi_mot_vid_tianma_1080p_565", "tianma,mdss_dsi_mot_tianma_565_1080p_vid_v0", "tianma,mot_tianma_565_1080p_vid_v0";
+		
+		reg = <0>;
+		
+		// found these downstream and in similar devices
+		supply-names = "vsp", "vsn"; 
+		
+		
+		// found these downstream and in similar devices
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&pmx_mdss_default>; 
+		pinctrl-1 = <&pmx_mdss_sleep>; 
+		
+		backlight = <&pmi8950_wled>;
+		
+		reset-gpios = <&msmgpio 61 GPIO_ACTIVE_LOW>; // similar devices have GPIO_ACTIVE_LOW, but downstream looks like it should be GPIO_ACTIVE_HIGH. TODO: investigate
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&dsi0_out>;
+			};
+		};
+	};
+};
+
+&dsi0_out {
+	data-lanes = <0 1 2 3>;
+	remote-endpoint = <&panel_in>;
+};
 
 &camss {
 	status = "okay";
