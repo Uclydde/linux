@@ -66,6 +66,29 @@
   
 };
 
+&i2c_3 {
+	status = "okay";
+
+	touchscreen@38 {
+		reg = <0x38>; // downstream
+		compatible = "focaltech,mmi";
+		interrupts-parent = <&msmgpio>; // downstream
+		interrupts-extended = <&msmgpio 65 0x2002>; // downstream
+
+		#address-cells = <1>; // downstream
+		#size-cells = <0>; // downstream
+
+		vdd-supply = <0xe2>;
+		vio-supply = <&pm8953_l22>;
+		gpios = <&msmgpio 65 0x2002>,
+			<&msmgpio 64 GPIO_ACTIVE_HIGH>;
+
+		pinctrl-names = "default"; // TODO: idk what to put here.
+		pinctrl-0 = <0xe3 0xe4>;
+		pinctrl-1 = <0xe5 0xe6>;
+	};
+};
+
 &atc_leds {
 	status = "okay";
 };
@@ -94,7 +117,7 @@
 		
 		
 		// found these downstream and in similar devices
-		pinctrl-names = "default", "sleep";
+		pinctrl-names = "default"; // downstream, it is "pmx_ts_active", "pmx_ts_suspend". this value is just a guess (xiaomi-daisy uses focaltech, and puts "default" here.)
 		pinctrl-0 = <&pmx_mdss_default>; 
 		pinctrl-1 = <&pmx_mdss_sleep>; 
 		
