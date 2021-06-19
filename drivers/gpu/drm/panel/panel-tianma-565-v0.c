@@ -12,6 +12,8 @@
 #include <drm/drm_modes.h>
 #include <drm/drm_panel.h>
 
+#include "panel-mipi-dsi-common.h"
+
 struct tianma_565_v0 {
 	struct drm_panel panel;
 	struct mipi_dsi_device *dsi;
@@ -32,19 +34,18 @@ static inline struct tianma_565_v0 *to_tianma_565_v0(struct drm_panel *panel)
 			return ret;					\
 	} while (0)
 
-static void tianma_565_v0_reset(struct tianma_565_v0 *ctx)
+static void tianma_565_v0_reset(struct gpio_desc *reset_gpio)
 {
-	gpiod_set_value_cansleep(ctx->reset_gpio, 0);
+	gpiod_set_value_cansleep(reset_gpio, 0);
 	usleep_range(5000, 6000);
-	gpiod_set_value_cansleep(ctx->reset_gpio, 1);
+	gpiod_set_value_cansleep(reset_gpio, 1);
 	usleep_range(1000, 2000);
-	gpiod_set_value_cansleep(ctx->reset_gpio, 0);
+	gpiod_set_value_cansleep(reset_gpio, 0);
 	usleep_range(10000, 11000);
 }
 
-static int tianma_565_v0_on(struct tianma_565_v0 *ctx)
+static int tianma_565_v0_on(struct mipi_dsi_device *dsi)
 {
-	struct mipi_dsi_device *dsi = ctx->dsi;
 	struct device *dev = &dsi->dev;
 	int ret;
 
@@ -241,7 +242,6 @@ static const struct of_device_id tianma_565_v0_of_match[] = {
 	{ .compatible = "tianma,565-v0" }, // FIXME
 	{ /* sentinel */ }
 };
-MODULE_DEVICE_TABLE(of, tianma_565_v0_of_match);
 
 static struct mipi_dsi_driver tianma_565_v0_driver = {
 	.probe = tianma_565_v0_probe,
@@ -251,7 +251,34 @@ static struct mipi_dsi_driver tianma_565_v0_driver = {
 		.of_match_table = tianma_565_v0_of_match,
 	},
 };
-module_mipi_dsi_driver(tianma_565_v0_driver);
+
+static const struct panel_mipi_dsi_info tianma_565_v0_info = {
+	.mode = {
+		.clock = (1080 + 53 + 4 + 53) * (2160 + 14 + 1 + 11) * 60 / 1000,
+		.hdisplay = 1080,
+		.hsync_start = 1080 + 53,
+		.hsync_end = 1080 + 53 + 4,
+		.htotal = 1080 + 53 + 4 + 53,
+		.vdisplay = 2160,
+		.vsync_start = 2160 + 14,
+		.vsync_end = 2160 + 14 + 1,
+		.vtotal = 2160 + 14 + 1 + 11,
+		.width_mm = 62,
+		.height_mm = 110,
+	},
+
+	.reset = tianma_565_v0_reset,
+	.power_on = tianma_565_v0_on,
+
+	.lanes = 4,
+	.format = MIPI_DSI_FMT_RGB888,
+	.mode_flags = MIPI_DSI_MODE_VIDEO
+		    | MIPI_DSI_MODE_VIDEO_BURST
+		    | MIPI_DSI_CLOCK_NON_CONTINUOUS
+		    | MIPI_DSI_MODE_LPM
+};
+
+MIPI_DSI_PANEL_DRIVER(tianma_565_v0, "tianma-565-v0", "tianma,565-v0");
 
 MODULE_AUTHOR("linux-mdss-dsi-panel-driver-generator <fix@me>"); // FIXME
 MODULE_DESCRIPTION("DRM driver for mipi_mot_vid_tianma_1080p_565");
