@@ -128,54 +128,6 @@ static int tianma_565_v0_get_modes(struct drm_panel *panel,
 	return 1;
 }
 
-static const struct drm_panel_funcs tianma_565_v0_panel_funcs = {
-	.prepare = tianma_565_v0_prepare,
-	.unprepare = tianma_565_v0_unprepare,
-	.get_modes = tianma_565_v0_get_modes,
-};
-
-static int tianma_565_v0_probe(struct mipi_dsi_device *dsi)
-{
-	struct device *dev = &dsi->dev;
-	struct tianma_565_v0 *ctx;
-	int ret;
-
-	ctx = devm_kzalloc(dev, sizeof(*ctx), GFP_KERNEL);
-	if (!ctx)
-		return -ENOMEM;
-
-	ctx->reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);
-	if (IS_ERR(ctx->reset_gpio))
-		return dev_err_probe(dev, PTR_ERR(ctx->reset_gpio),
-				     "Failed to get reset-gpios\n");
-
-	ctx->dsi = dsi;
-	mipi_dsi_set_drvdata(dsi, ctx);
-
-	dsi->lanes = 4;
-	dsi->format = MIPI_DSI_FMT_RGB888;
-	dsi->mode_flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_BURST |
-			  MIPI_DSI_CLOCK_NON_CONTINUOUS | MIPI_DSI_MODE_LPM;
-
-	drm_panel_init(&ctx->panel, dev, &tianma_565_v0_panel_funcs,
-		       DRM_MODE_CONNECTOR_DSI);
-
-	ret = drm_panel_of_backlight(&ctx->panel);
-	if (ret)
-		return dev_err_probe(dev, ret, "Failed to get backlight\n");
-
-	drm_panel_add(&ctx->panel);
-
-	ret = mipi_dsi_attach(dsi);
-	if (ret < 0) {
-		dev_err(dev, "Failed to attach to DSI host: %d\n", ret);
-		drm_panel_remove(&ctx->panel);
-		return ret;
-	}
-
-	return 0;
-}
-
 static int tianma_565_v0_remove(struct mipi_dsi_device *dsi)
 {
 	struct tianma_565_v0 *ctx = mipi_dsi_get_drvdata(dsi);
@@ -189,16 +141,6 @@ static int tianma_565_v0_remove(struct mipi_dsi_device *dsi)
 
 	return 0;
 }
-
-
-static struct mipi_dsi_driver tianma_565_v0_driver = {
-	.probe = tianma_565_v0_probe,
-	.remove = tianma_565_v0_remove,
-	.driver = {
-		.name = "panel-tianma-565-v0",
-		.of_match_table = tianma_565_v0_of_match,
-	},
-};
 
 static const struct panel_mipi_dsi_info tianma_565_v0_info = {
 	.mode = {
