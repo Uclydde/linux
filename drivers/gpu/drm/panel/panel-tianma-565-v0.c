@@ -26,14 +26,6 @@ static inline struct tianma_565_v0 *to_tianma_565_v0(struct drm_panel *panel)
 	return container_of(panel, struct tianma_565_v0, panel);
 }
 
-#define dsi_dcs_write_seq(dsi, seq...) do {				\
-		static const u8 d[] = { seq };				\
-		int ret;						\
-		ret = mipi_dsi_dcs_write_buffer(dsi, d, ARRAY_SIZE(d));	\
-		if (ret < 0)						\
-			return ret;					\
-	} while (0)
-
 static void tianma_565_v0_reset(struct gpio_desc *reset_gpio)
 {
 	gpiod_set_value_cansleep(reset_gpio, 0);
