@@ -94,46 +94,6 @@ static int tianma_565_v0_off(struct tianma_565_v0 *ctx)
 	return 0;
 }
 
-static int tianma_565_v0_prepare(struct drm_panel *panel)
-{
-	struct tianma_565_v0 *ctx = to_tianma_565_v0(panel);
-	struct device *dev = &ctx->dsi->dev;
-	int ret;
-
-	if (ctx->prepared)
-		return 0;
-
-	tianma_565_v0_reset(ctx);
-
-	ret = tianma_565_v0_on(ctx);
-	if (ret < 0) {
-		dev_err(dev, "Failed to initialize panel: %d\n", ret);
-		gpiod_set_value_cansleep(ctx->reset_gpio, 1);
-		return ret;
-	}
-
-	ctx->prepared = true;
-	return 0;
-}
-
-static int tianma_565_v0_unprepare(struct drm_panel *panel)
-{
-	struct tianma_565_v0 *ctx = to_tianma_565_v0(panel);
-	struct device *dev = &ctx->dsi->dev;
-	int ret;
-
-	if (!ctx->prepared)
-		return 0;
-
-	ret = tianma_565_v0_off(ctx);
-	if (ret < 0)
-		dev_err(dev, "Failed to un-initialize panel: %d\n", ret);
-
-	gpiod_set_value_cansleep(ctx->reset_gpio, 1);
-
-	ctx->prepared = false;
-	return 0;
-}
 
 static const struct drm_display_mode tianma_565_v0_mode = {
 	.clock = (1080 + 53 + 4 + 53) * (2160 + 14 + 1 + 11) * 60 / 1000,
