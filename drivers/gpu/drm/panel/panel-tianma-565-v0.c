@@ -190,10 +190,6 @@ static int tianma_565_v0_remove(struct mipi_dsi_device *dsi)
 	return 0;
 }
 
-static const struct of_device_id tianma_565_v0_of_match[] = {
-	{ .compatible = "tianma,565-v0" }, // FIXME
-	{ /* sentinel */ }
-};
 
 static struct mipi_dsi_driver tianma_565_v0_driver = {
 	.probe = tianma_565_v0_probe,
