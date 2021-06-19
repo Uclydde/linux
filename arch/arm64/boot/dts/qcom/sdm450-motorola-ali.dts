@@ -69,23 +69,23 @@
 &i2c_3 {
 	status = "okay";
 
-	touchscreen@38 {
-		reg = <0x38>; // downstream
-		compatible = "edt,edt-ft5406", "edt,edt-ft5x06"; // actually this touchscreen is the ft5546, but close enough I guess
-		interrupts-parent = <&msmgpio>; // downstream
-		interrupts-extended = <&msmgpio 65 0x2002>; // downstream
+	focaltech@38 {
+		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
+		reg = <0x38>;
+		interrupt-parent = <&msmgpio>;
+		interrupts = <65 IRQ_TYPE_EDGE_FALLING>;
+		vcc-supply = <&pm8953_l10>;
 
-		#address-cells = <1>; // downstream
-		#size-cells = <0>; // downstream
+		reset-gpios = <&msmgpio 64 GPIO_ACTIVE_LOW>;
 
-		vdd-supply = <0xe2>;
-		vio-supply = <&pm8953_l22>;
-		gpios = <&msmgpio 65 0x2002>,
-			<&msmgpio 64 GPIO_ACTIVE_HIGH>;
+		/* pins used by touchscreen */
+		pinctrl-names = "default"; //,"sleep", "pmx_ts_release";
+		pinctrl-0 = <&ts_int_active &ts_reset_active>;
 
-		pinctrl-names = "default"; // TODO: idk what to put here.
-		pinctrl-0 = <0xe3 0xe4>;
-		pinctrl-1 = <0xe5 0xe6>;
+		// Same as goodix touchscreen, don't know if this is needed
+		// pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		// pinctrl-2 = <&ts_release>;
+
 		touchscreen-size-x = <1080>;
 		touchscreen-size-y = <2280>;
 	};
