@@ -223,8 +223,6 @@
 		bias-pull-down;
 	};
 
-	
-
 	ts_reset_active: ts-reset-active-pins {
 		pins = "gpio64";
 		function = "gpio";
@@ -232,12 +230,31 @@
 		bias-pull-up;
 	};
 
-
 	ts_reset_suspend: ts-reset-suspend-pins {
 		pins = "gpio64";
 		function = "gpio";
 		drive-strength = <2>;
 		bias-pull-down;
+	};
+	
+	nfc_irq_default: nfc-irq-pins {
+		pins = "gpio17";
+		bias-pull-down;
+		drive-strength = <2>;
+	};
+
+	nfc_pwr_default: nfc-pwr-pins {
+		pins = "gpio16";
+		bias-pull-down;
+		output-low;
+		drive-strength = <2>;
+	};
+
+	nfc_firm_default: nfc-firm-pins {
+		pins = "gpio62";
+		bias-pull-down;
+		output-low;
+		drive-strength = <2>;
 	};
 
 };
