@@ -219,7 +219,7 @@
 		touchscreen-size-y = <2280>;
 	};
 	focaltech@38 {
-		compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
+		compatible = "edt,edt-ft5406", "edt,edt-ft5x06"; // the component is actually ft5446, though the ft5x06 driver works.
 		reg = <0x38>;
 		interrupt-parent = <&msmgpio>;
 		interrupts = <65 IRQ_TYPE_EDGE_FALLING>;
@@ -236,7 +236,7 @@
 		// pinctrl-2 = <&ts_release>;
 
 		touchscreen-size-x = <1080>;
-		touchscreen-size-y = <2280>;
+		touchscreen-size-y = <2160>;
 	};
 };
 
