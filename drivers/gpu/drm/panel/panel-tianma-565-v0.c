@@ -1,0 +1,175 @@
+// SPDX-License-Identifier: GPL-2.0-only
+// Copyright (c) 2021 FIXME
+// Generated with linux-mdss-dsi-panel-driver-generator from vendor device tree:
+//   Copyright (c) 2013, The Linux Foundation. All rights reserved. (FIXME)
+
+#include <linux/delay.h>
+#include <linux/gpio/consumer.h>
+#include <linux/module.h>
+#include <linux/of.h>
+
+#include <drm/drm_mipi_dsi.h>
+#include <drm/drm_modes.h>
+#include <drm/drm_panel.h>
+
+#include "panel-mipi-dsi-common.h"
+
+struct tianma_565_v0 {
+	struct drm_panel panel;
+	struct mipi_dsi_device *dsi;
+	struct gpio_desc *reset_gpio;
+	bool prepared;
+};
+
+static inline struct tianma_565_v0 *to_tianma_565_v0(struct drm_panel *panel)
+{
+	return container_of(panel, struct tianma_565_v0, panel);
+}
+
+static void tianma_565_v0_reset(struct gpio_desc *reset_gpio)
+{
+	gpiod_set_value_cansleep(reset_gpio, 0);
+	usleep_range(5000, 6000);
+	gpiod_set_value_cansleep(reset_gpio, 1);
+	usleep_range(1000, 2000);
+	gpiod_set_value_cansleep(reset_gpio, 0);
+	usleep_range(10000, 11000);
+}
+
+static int tianma_565_v0_on(struct mipi_dsi_device *dsi)
+{
+	struct device *dev = &dsi->dev;
+	int ret;
+
+	dsi_dcs_write_seq(dsi, 0x00, 0x00);
+	dsi_dcs_write_seq(dsi, 0xff, 0x19, 0x11, 0x01);
+	dsi_dcs_write_seq(dsi, 0x00, 0x80);
+	dsi_dcs_write_seq(dsi, 0xff, 0x19, 0x11);
+	dsi_dcs_write_seq(dsi, 0x00, 0xb0);
+	dsi_dcs_write_seq(dsi, 0xb3, 0x04, 0x38, 0x08, 0x70);
+	dsi_dcs_write_seq(dsi, 0x00, 0x00);
+	dsi_dcs_write_seq(dsi, 0xff, 0xff, 0xff, 0xff);
+	dsi_dcs_write_seq(dsi, 0x35, 0x00);
+	dsi_dcs_write_seq(dsi, 0x51, 0xcc, 0x08);
+	dsi_dcs_write_seq(dsi, 0x53, 0x2c);
+	dsi_dcs_write_seq(dsi, 0x55, 0x01);
+
+	ret = mipi_dsi_dcs_exit_sleep_mode(dsi);
+	if (ret < 0) {
+		dev_err(dev, "Failed to exit sleep mode: %d\n", ret);
+		return ret;
+	}
+	msleep(120);
+
+	ret = mipi_dsi_dcs_set_display_on(dsi);
+	if (ret < 0) {
+		dev_err(dev, "Failed to set display on: %d\n", ret);
+		return ret;
+	}
+	usleep_range(10000, 11000);
+
+	return 0;
+}
+
+static int tianma_565_v0_off(struct tianma_565_v0 *ctx)
+{
+	struct mipi_dsi_device *dsi = ctx->dsi;
+	struct device *dev = &dsi->dev;
+	int ret;
+
+	ret = mipi_dsi_dcs_set_display_off(dsi);
+	if (ret < 0) {
+		dev_err(dev, "Failed to set display off: %d\n", ret);
+		return ret;
+	}
+	msleep(50);
+
+	ret = mipi_dsi_dcs_enter_sleep_mode(dsi);
+	if (ret < 0) {
+		dev_err(dev, "Failed to enter sleep mode: %d\n", ret);
+		return ret;
+	}
+	msleep(70);
+
+	return 0;
+}
+
+
+static const struct drm_display_mode tianma_565_v0_mode = {
+	.clock = (1080 + 53 + 4 + 53) * (2160 + 14 + 1 + 11) * 60 / 1000,
+	.hdisplay = 1080,
+	.hsync_start = 1080 + 53,
+	.hsync_end = 1080 + 53 + 4,
+	.htotal = 1080 + 53 + 4 + 53,
+	.vdisplay = 2160,
+	.vsync_start = 2160 + 14,
+	.vsync_end = 2160 + 14 + 1,
+	.vtotal = 2160 + 14 + 1 + 11,
+	.width_mm = 62,
+	.height_mm = 110,
+};
+
+static int tianma_565_v0_get_modes(struct drm_panel *panel,
+				   struct drm_connector *connector)
+{
+	struct drm_display_mode *mode;
+
+	mode = drm_mode_duplicate(connector->dev, &tianma_565_v0_mode);
+	if (!mode)
+		return -ENOMEM;
+
+	drm_mode_set_name(mode);
+
+	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
+	connector->display_info.width_mm = mode->width_mm;
+	connector->display_info.height_mm = mode->height_mm;
+	drm_mode_probed_add(connector, mode);
+
+	return 1;
+}
+
+static int tianma_565_v0_remove(struct mipi_dsi_device *dsi)
+{
+	struct tianma_565_v0 *ctx = mipi_dsi_get_drvdata(dsi);
+	int ret;
+
+	ret = mipi_dsi_detach(dsi);
+	if (ret < 0)
+		dev_err(&dsi->dev, "Failed to detach from DSI host: %d\n", ret);
+
+	drm_panel_remove(&ctx->panel);
+
+	return 0;
+}
+
+static const struct panel_mipi_dsi_info tianma_565_v0_info = {
+	.mode = {
+		.clock = (1080 + 53 + 4 + 53) * (2160 + 14 + 1 + 11) * 60 / 1000,
+		.hdisplay = 1080,
+		.hsync_start = 1080 + 53,
+		.hsync_end = 1080 + 53 + 4,
+		.htotal = 1080 + 53 + 4 + 53,
+		.vdisplay = 2160,
+		.vsync_start = 2160 + 14,
+		.vsync_end = 2160 + 14 + 1,
+		.vtotal = 2160 + 14 + 1 + 11,
+		.width_mm = 62,
+		.height_mm = 110,
+	},
+
+	.reset = tianma_565_v0_reset,
+	.power_on = tianma_565_v0_on,
+
+	.lanes = 4,
+	.format = MIPI_DSI_FMT_RGB888,
+	.mode_flags = MIPI_DSI_MODE_VIDEO
+		    | MIPI_DSI_MODE_VIDEO_BURST
+		    | MIPI_DSI_CLOCK_NON_CONTINUOUS
+		    | MIPI_DSI_MODE_LPM
+};
+
+MIPI_DSI_PANEL_DRIVER(tianma_565_v0, "tianma-565-v0", "tianma,565-v0");
+
+MODULE_AUTHOR("linux-mdss-dsi-panel-driver-generator <fix@me>"); // FIXME
+MODULE_DESCRIPTION("DRM driver for mipi_mot_vid_tianma_1080p_565");
+MODULE_LICENSE("GPL v2");
