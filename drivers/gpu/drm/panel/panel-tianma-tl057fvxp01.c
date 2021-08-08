@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* 
+/*
  * Copyright (c) 2021 Julian Braha <julianbraha@gmail.com>
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
  * Generated with linux-mdss-dsi-panel-driver-generator from vendor device tree
@@ -14,7 +14,7 @@
 
 #include "panel-mipi-dsi-common.h"
 
-static void tianma_565_v0_reset(struct gpio_desc *reset_gpio)
+static void tianma_tl057fvxp01_reset(struct gpio_desc *reset_gpio)
 {
 	gpiod_set_value_cansleep(reset_gpio, 0);
 	usleep_range(5000, 6000);
@@ -24,7 +24,7 @@ static void tianma_565_v0_reset(struct gpio_desc *reset_gpio)
 	usleep_range(10000, 11000);
 }
 
-static int tianma_565_v0_on(struct mipi_dsi_device *dsi)
+static int tianma_tl057fvxp01_on(struct mipi_dsi_device *dsi)
 {
 	struct device *dev = &dsi->dev;
 	int ret;
@@ -59,7 +59,7 @@ static int tianma_565_v0_on(struct mipi_dsi_device *dsi)
 	return 0;
 }
 
-static const struct panel_mipi_dsi_info tianma_565_v0_info = {
+static const struct panel_mipi_dsi_info tianma_tl057fvxp01_info = {
 	.mode = {
 		.clock = (1080 + 53 + 4 + 53) * (2160 + 14 + 1 + 11) * 60 / 1000,
 		.hdisplay = 1080,
@@ -74,8 +74,8 @@ static const struct panel_mipi_dsi_info tianma_565_v0_info = {
 		.height_mm = 110,
 	},
 
-	.reset = tianma_565_v0_reset,
-	.power_on = tianma_565_v0_on,
+	.reset = tianma_tl057fvxp01_reset,
+	.power_on = tianma_tl057fvxp01_on,
 
 	.lanes = 4,
 	.format = MIPI_DSI_FMT_RGB888,
@@ -85,7 +85,7 @@ static const struct panel_mipi_dsi_info tianma_565_v0_info = {
 		    | MIPI_DSI_MODE_LPM
 };
 
-MIPI_DSI_PANEL_DRIVER(tianma_565_v0, "tianma-565-v0", "tianma,565-v0");
+MIPI_DSI_PANEL_DRIVER(tianma_tl057fvxp01, "tianma-tl057fvxp01", "tianma,tl057fvxp01");
 
 MODULE_AUTHOR("Julian Braha <julianbraha@gmail.com>");
 MODULE_DESCRIPTION("Tianma TL057FVXP01 panel driver");
