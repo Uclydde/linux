@@ -1,0 +1,361 @@
+// SPDX-License-Identifier: GPL-2.0-only
+// Copyright (c) 2020, The Linux Foundation. All rights reserved.
+
+/dts-v1/;
+
+#include "msm8953-pm8953.dtsi"
+#include "pmi8950.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/leds/common.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+
+/ {
+  model = "ali";
+  compatible = "qcom,sdm450-ali", "qcom,sdm450-moto", "qcom,sdm450", "qcom,msm8953-moto", "qcom,msm8953", "lk2nd,device";
+  qcom,msm-id = <338 0>;
+  qcom,board-id = <0x41 0xb1a0 0x42 0xb1a0>, <0x43 0xc100>, <0x42 0xb1b0>, <0x43 0xc200 0x44 0xc200>, <0x42 0xb200 0x43 0xb200>;
+
+  aliases {
+  	panel = &panel;
+  };
+
+
+  reserved-memory {
+	/delete-node/other_ext_region@85b00000;
+
+	other_ext_region@84300000 {
+		no-map;
+		reg = <0x0 0x84300000 0x0 0x2000000>;
+	};
+
+	/*ramoops_mem: ramoops_mem_region {
+		no-map;
+		compatible = "ramoops";
+		reg = <0x0 0xef000000 0x0 0xC0000>;
+		console-size = <0x40000>;
+	};*/
+
+	tzlog_bck_region@eefe4000 {
+		no-map;
+		reg = <0x0 0xeefe4000 0x0 0x2000>;
+	};
+
+	wdog_cpuctx_region@eefe6000 {
+		no-map;
+		reg = <0x0 0xeefe6000 0x0 0x1a000>;
+	};
+
+  };
+
+  	gpio-keys {
+		compatible = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&gpio_key_default>;
+
+		label = "GPIO Button";
+
+		volume-up {
+			label = "Volume Up";
+			gpios = <&msmgpio 85 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_VOLUMEUP>;
+		};
+	};
+
+};
+
+&i2c_3 {
+	status = "okay";
+
+	focaltech@38 {
+		compatible = "edt,edt-ft5406", "edt,edt-ft5x06"; // the touchscreen is actually ft5446, but the ft5406 driver works.
+		reg = <0x38>;
+		interrupt-parent = <&msmgpio>;
+		interrupts = <65 IRQ_TYPE_EDGE_FALLING>;
+		vcc-supply = <&pm8953_l10>;
+
+		reset-gpios = <&msmgpio 64 GPIO_ACTIVE_LOW>;
+
+		/* pins used by touchscreen */
+		pinctrl-names = "default"; //,"sleep", "pmx_ts_release";
+		pinctrl-0 = <&ts_int_active &ts_reset_active>;
+
+		// Same as goodix touchscreen, don't know if this is needed
+		// pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		// pinctrl-2 = <&ts_release>;
+
+		touchscreen-size-x = <1080>;
+		touchscreen-size-y = <2160>;
+	};
+};
+
+&i2c_5 {
+	nfc@28 {
+		// TODO: fill this in
+	};
+};
+
+&atc_leds {
+	status = "okay";
+};
+
+&pmi8950_wled {
+	status = "okay";
+
+	/* Don't copy-paste! See pmi8950.dtsi */
+
+	qcom,current-limit-microamp = <25000>;
+	qcom,enabled-strings = <0 1 2>;
+	qcom,num-strings = <3>;
+
+	qcom,cabc;
+	qcom,eternal-pfet;
+};
+
+&dsi0 {
+	panel: panel@0 {
+		compatible = "tianma,tl057fvxp01", "tianma-tl057fvxp01", "tianma,565-v0", "qcom,mipi_mot_vid_tianma_1080p_565", "qcom,mdss_dsi_mot_tianma_565_1080p_vid_v0", "qcom,mdss_dsi_mot_dummy_qhd_video", "qcom,mipi_mot_video_dummy_qhd", "qcom,mot_tianma_565_1080p_vid_v0", "qcom,mdss-dsi-panel", "tianma,mipi_mot_vid_tianma_1080p_565", "tianma,mdss_dsi_mot_tianma_565_1080p_vid_v0", "tianma,mot_tianma_565_1080p_vid_v0";
+
+		reg = <0>;
+
+		// found these downstream and in similar devices
+		supply-names = "vsp", "vsn";
+
+
+		// found these downstream and in similar devices
+		pinctrl-names = "default"; // downstream, it is "pmx_ts_active", "pmx_ts_suspend". this value is just a guess (xiaomi-daisy uses focaltech, and puts "default" here.)
+		pinctrl-0 = <&pmx_mdss_default>;
+		pinctrl-1 = <&pmx_mdss_sleep>;
+
+		backlight = <&pmi8950_wled>;
+
+		reset-gpios = <&msmgpio 61 GPIO_ACTIVE_LOW>; // similar devices have GPIO_ACTIVE_LOW, but downstream looks like it should be GPIO_ACTIVE_HIGH. TODO: investigate
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&dsi0_out>;
+			};
+		};
+	};
+};
+
+&dsi0_out {
+	data-lanes = <0 1 2 3>;
+	remote-endpoint = <&panel_in>;
+};
+
+&wcd_codec {
+	qcom,micbias1-ext-cap;
+	qcom,hphl-jack-type-normally-open;
+
+	// I couldn't verify these two downstream:
+	//qcom,mbhc-vthreshold-low = <75 150 237 450 500>;
+	//qcom,mbhc-vthreshold-high = <75 150 237 450 500>;
+};
+
+&camss {
+	status = "okay";
+	compatible = "qcom,sdm450-camss";
+	vdda-supply = <&pm8953_s3>;
+
+	ports {
+		// empty for now (TODO: fill in later)
+	};
+};
+
+&sdhc_1 {
+	status = "okay";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc1_clk_on &sdc1_cmd_on &sdc1_data_on  &sdc1_rclk_on>;
+	pinctrl-1 = <&sdc1_clk_off &sdc1_cmd_off &sdc1_data_off &sdc1_rclk_off>;
+};
+
+&sdhc_2 {
+	status = "okay";
+
+	// found this downstream (and in similar non-motorola device trees)
+	// motorola-potter comments this out, so we will do it too, I guess :)
+	//cd-gpios = <&msmgpio 133 GPIO_ACTIVE_HIGH>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sdc2_clk_on &sdc2_cmd_on &sdc2_data_on &sdc2_cd_off>;
+	pinctrl-1 = <&sdc2_clk_off &sdc2_cmd_off &sdc2_data_off &sdc2_cd_off>;
+};
+
+
+&msmgpio {
+	gpio-reserved-ranges = <95 5>, <111 1>, <126 1>;
+
+	ts_reset: ts-reset-pins {
+		pins = "gpio64";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-pull-up;
+	};
+
+	touch_int_default: touch-int-default-pins {
+		pins = "gpio65";
+		function = "gpio";
+		bias-disable;
+	};
+
+	touch_int_suspend: touch-int-suspend-pins {
+		pins = "gpio65";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-pull-up;
+	};
+
+	pmx_mdss_default: pmx-mdss-default-pins {
+		pins = "gpio61", "gpio59";
+		function = "gpio";
+		drive-strength = <8>;
+		bias-disable;
+		output-high;
+	};
+
+	pmx_mdss_sleep: pmx-mdss-sleep-pins {
+		pins = "gpio61", "gpio59";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-pull-down;
+	};
+
+	ts_int_active: ts-int-active-pins {
+		pins = "gpio65";
+		function = "gpio";
+		drive-strength = <8>;
+		bias-pull-up;
+	};
+
+	ts_int_suspend: ts-int-suspend-pins {
+		pins = "gpio65";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-pull-down;
+	};
+
+	ts_reset_active: ts-reset-active-pins {
+		pins = "gpio64";
+		function = "gpio";
+		drive-strength = <0x08>;
+		bias-pull-up;
+	};
+
+	ts_reset_suspend: ts-reset-suspend-pins {
+		pins = "gpio64";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-pull-down;
+	};
+
+	nfc_irq_default: nfc-irq-pins {
+		pins = "gpio17";
+		bias-pull-down;
+		drive-strength = <2>;
+	};
+
+	nfc_pwr_default: nfc-pwr-pins {
+		pins = "gpio16";
+		bias-pull-down;
+		output-low;
+		drive-strength = <2>;
+	};
+
+	nfc_firm_default: nfc-firm-pins {
+		pins = "gpio62";
+		bias-pull-down;
+		output-low;
+		drive-strength = <2>;
+	};
+
+};
+
+&usb3 {
+	status = "okay";
+};
+
+
+&smd_rpm_regulators {
+	s1 {
+		regulator-min-microvolt = <795000>;
+		regulator-max-microvolt = <1081000>;
+	};
+	s3 {
+		regulator-min-microvolt = <1224000>;
+		regulator-max-microvolt = <1224000>;
+	};
+	s4 {
+		regulator-min-microvolt = <1900000>;
+		regulator-max-microvolt = <2050000>;
+	};
+	l1 {
+		regulator-min-microvolt = <1000000>;
+		regulator-max-microvolt = <1100000>;
+	};
+	l2 {
+		regulator-min-microvolt = <975000>;
+		regulator-max-microvolt = <1225000>;
+	};
+	l3 {
+		regulator-min-microvolt = <925000>;
+		regulator-max-microvolt = <925000>;
+	};
+	l5 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+	l6 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+	l7 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1900000>;
+	};
+	l8 {
+		regulator-min-microvolt = <2900000>;
+		regulator-max-microvolt = <2900000>;
+	};
+	l9 {
+		regulator-min-microvolt = <3000000>;
+		regulator-max-microvolt = <3300000>;
+	};
+	l10 {
+		regulator-min-microvolt = <2850000>;
+		regulator-max-microvolt = <2850000>;
+	};
+	l11 {
+		regulator-min-microvolt = <2950000>;
+		regulator-max-microvolt = <2950000>;
+	};
+	l12 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <2950000>;
+	};
+	l13 {
+		regulator-min-microvolt = <3125000>;
+		regulator-max-microvolt = <3125000>;
+	};
+	l16 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+	l17 {
+		regulator-min-microvolt = <2850000>;
+		regulator-max-microvolt = <2850000>;
+	};
+	l19 {
+		regulator-min-microvolt = <1200000>;
+		regulator-max-microvolt = <1350000>;
+	};
+	l22 {
+		regulator-min-microvolt = <2800000>;
+		regulator-max-microvolt = <2850000>;
+	};
+	l23 {
+		regulator-min-microvolt = <975000>;
+		regulator-max-microvolt = <1225000>;
+	};
+};
