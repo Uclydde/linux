@@ -91,7 +91,19 @@
 
 &i2c_5 {
 	nfc@28 {
-		// TODO: fill this in
+		compatible = "nxp,pn544-i2c";
+		reg = <0x28>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <17 0x00>;
+
+		enable-gpios = <&tlmm 16 GPIO_ACTIVE_HIGH>; /* EN */
+		firmware-gpios = <&tlmm 62 GPIO_ACTIVE_HIGH>; /* Firmware */
+
+		nxp,pnxx-discharge-delay = <100>;
+		nxp,pnxx-ven-inv-polarity = <0x00>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&nfc_irq_default &nfc_pwr_default &nfc_firm_default>;
 	};
 };
 
