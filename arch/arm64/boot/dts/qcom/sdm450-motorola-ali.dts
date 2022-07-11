@@ -93,11 +93,11 @@
 	nfc@28 {
 		compatible = "nxp,pn544-i2c";
 		reg = <0x28>;
-		interrupt-parent = <&tlmm>;
+		interrupt-parent = <&msmgpio>;
 		interrupts = <17 0x00>;
 
-		enable-gpios = <&tlmm 16 GPIO_ACTIVE_HIGH>; /* EN */
-		firmware-gpios = <&tlmm 62 GPIO_ACTIVE_HIGH>; /* Firmware */
+		enable-gpios = <&msmgpio 16 GPIO_ACTIVE_HIGH>; /* EN */
+		firmware-gpios = <&msmgpio 62 GPIO_ACTIVE_HIGH>; /* Firmware */
 
 		nxp,pnxx-discharge-delay = <100>;
 		nxp,pnxx-ven-inv-polarity = <0x00>;
