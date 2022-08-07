@@ -48,21 +48,17 @@
 
   };
 
-  	gpio-keys {
-		compatible = "gpio-keys";
 
-		pinctrl-names = "default";
-		pinctrl-0 = <&gpio_key_default>;
+	
+  gpio-keys {
+	compatible = "gpio-keys";
 
-		label = "GPIO Button";
-
-		volume-up {
-			label = "Volume Up";
-			gpios = <&tlmm 85 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_VOLUMEUP>;
-		};
+	volume-up {
+		label = "Volume Up";
+		gpios = <0xbe 0x55 0x01>;
+		linux,code = <KEY_VOLUMEUP>;
 	};
-
+  };
 };
 
 &i2c_3 {
