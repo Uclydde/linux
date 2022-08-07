@@ -285,6 +285,13 @@
 	status = "okay";
 };
 
+&hsusb_phy {
+	status = "okay";
+
+	vdd-supply = <&pm8953_l3>;
+	vdda-pll-supply = <&pm8953_l7>;
+	vdda-phy-dpdm-supply = <&pm8953_l13>;
+};
 
 &rpm_requests {
 	pm8953-regulators {
