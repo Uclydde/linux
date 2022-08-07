@@ -123,18 +123,15 @@
 
 		reg = <0>;
 
-		// found these downstream and in similar devices
 		supply-names = "vsp", "vsn";
 
-
-		// found these downstream and in similar devices
-		pinctrl-names = "default"; // downstream, it is "pmx_ts_active", "pmx_ts_suspend". this value is just a guess (xiaomi-daisy uses focaltech, and puts "default" here.)
+		pinctrl-names = "default";
 		pinctrl-0 = <&pmx_mdss_default>;
 		pinctrl-1 = <&pmx_mdss_sleep>;
 
 		backlight = <&pmi8950_wled>;
 
-		reset-gpios = <&tlmm 61 GPIO_ACTIVE_LOW>; // similar devices have GPIO_ACTIVE_LOW, but downstream looks like it should be GPIO_ACTIVE_HIGH. TODO: investigate
+		reset-gpios = <&tlmm 61 GPIO_ACTIVE_LOW>;
 
 		port {
 			panel_in: endpoint {
