@@ -200,6 +200,9 @@
 	vdddig-supply = <&pm8953_l5>;
 };
 
+&lpass {
+	status = "okay";
+};
 
 &tlmm {
 	gpio-reserved-ranges = <95 5>, <111 1>, <126 1>;
