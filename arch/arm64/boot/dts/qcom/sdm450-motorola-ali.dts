@@ -14,6 +14,11 @@
 
   reserved-memory {
 	/delete-node/other_ext_region@85b00000;
+	
+	other_ext_region@84300000 {
+		no-map;
+		reg = <0x0 0x84300000 0x0 0x2000000>;
+	};
 
 	ramoops_mem: ramoops_mem_region {
 		no-map;
