@@ -67,7 +67,6 @@
 
 		supply-names = "vsp", "vsn";
 		reset-gpios = <&tlmm 61 GPIO_ACTIVE_LOW>;
-		backlight = <&pmi8950_wled>;
 		
 		pinctrl-names = "default";
 		pinctrl-0 = <&pmx_mdss_default>;
