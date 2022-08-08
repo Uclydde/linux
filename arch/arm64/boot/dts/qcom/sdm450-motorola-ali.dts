@@ -5,7 +5,6 @@
 
 #include "msm8953.dtsi"
 #include "pm8953.dtsi"
-#include "pmi8950.dtsi"
 
 / {
   model = "ali";
@@ -16,26 +15,11 @@
   reserved-memory {
 	/delete-node/other_ext_region@85b00000;
 
-	other_ext_region@84300000 {
-		no-map;
-		reg = <0x0 0x84300000 0x0 0x2000000>;
-	};
-
 	ramoops_mem: ramoops_mem_region {
 		no-map;
 		compatible = "ramoops";
 		reg = <0x0 0xef000000 0x0 0xC0000>;
 		console-size = <0x40000>;
-	};
-
-	tzlog_bck_region@eefe4000 {
-		no-map;
-		reg = <0x0 0xeefe4000 0x0 0x2000>;
-	};
-
-	wdog_cpuctx_region@eefe6000 {
-		no-map;
-		reg = <0x0 0xeefe6000 0x0 0x1a000>;
 	};
   };
   
@@ -74,19 +58,6 @@
 		touchscreen-size-x = <1080>;
 		touchscreen-size-y = <2160>;
 	};
-};
-
-&pmi8950_wled {
-	status = "okay";
-
-	/* Don't copy-paste! See pmi8950.dtsi */
-
-	qcom,current-limit-microamp = <25000>;
-	qcom,enabled-strings = <0 1 2>;
-	qcom,num-strings = <3>;
-
-	qcom,cabc;
-	qcom,eternal-pfet;
 };
 
 &dsi0 {
