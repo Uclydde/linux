@@ -52,7 +52,9 @@
 	compatible = "gpio-keys";
 
 	volume-up {
-		// TODO
+		label = "volume_up";
+		linux,code = <KEY_VOLUMEUP>;
+		gpios = <&tlmm 85 GPIO_ACTIVE_LOW>;
 	};
   };
 };
@@ -301,6 +303,11 @@
 	vdd-supply = <&pm8953_l3>;
 	vdda-pll-supply = <&pm8953_l7>;
 	vdda-phy-dpdm-supply = <&pm8953_l13>;
+};
+
+&pm8953_resin {
+	status = "okay";
+	linux,code = <KEY_VOLUMEDOWN>;
 };
 
 &rpm_requests {
