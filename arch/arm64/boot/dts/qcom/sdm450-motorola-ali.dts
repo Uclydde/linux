@@ -5,6 +5,7 @@
 
 #include "msm8953.dtsi"
 #include "pm8953.dtsi"
+#include "pmi8950.dtsi"
 
 / {
   model = "ali";
@@ -75,6 +76,19 @@
 	};
 };
 
+&pmi8950_wled {
+	status = "okay";
+
+	/* Don't copy-paste! See pmi8950.dtsi */
+
+	qcom,current-limit-microamp = <25000>;
+	qcom,enabled-strings = <0 1 2>;
+	qcom,num-strings = <3>;
+
+	qcom,cabc;
+	qcom,eternal-pfet;
+};
+
 &dsi0 {
 	panel@0 {
 		compatible = "tianma,tl057fvxp01";
@@ -82,6 +96,7 @@
 
 		supply-names = "vsp", "vsn";
 		reset-gpios = <&tlmm 61 GPIO_ACTIVE_LOW>;
+		backlight = <&pmi8950_wled>;
 		
 		pinctrl-names = "default";
 		pinctrl-0 = <&pmx_mdss_default>;
