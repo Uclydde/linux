@@ -185,6 +185,12 @@
 	pinctrl-1 = <&sdc2_clk_off &sdc2_cmd_off &sdc2_data_off &sdc2_cd_off>;
 };
 
+&pronto {
+	status = "okay";
+
+	vddpx-supply = <&pm8953_l5>;
+};
+
 
 &tlmm {
 	gpio-reserved-ranges = <95 5>, <111 1>, <126 1>;
