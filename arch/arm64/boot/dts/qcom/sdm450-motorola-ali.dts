@@ -5,10 +5,6 @@
 
 #include "msm8953.dtsi"
 #include "pm8953.dtsi"
-#include "pmi8950.dtsi"
-#include <dt-bindings/gpio/gpio.h>
-#include <dt-bindings/leds/common.h>
-#include <dt-bindings/interrupt-controller/irq.h>
 
 / {
   model = "ali";
@@ -97,23 +93,6 @@
 	};
 };
 
-&atc_leds {
-	status = "okay";
-};
-
-&pmi8950_wled {
-	status = "okay";
-
-	/* Don't copy-paste! See pmi8950.dtsi */
-
-	qcom,current-limit-microamp = <25000>;
-	qcom,enabled-strings = <0 1 2>;
-	qcom,num-strings = <3>;
-
-	qcom,cabc;
-	qcom,eternal-pfet;
-};
-
 &dsi0 {
 	panel@0 {
 		compatible = "tianma,tl057fvxp01";
@@ -121,7 +100,6 @@
 
 		supply-names = "vsp", "vsn";
 		reset-gpios = <&tlmm 61 GPIO_ACTIVE_LOW>;
-		backlight = <&pmi8950_wled>;
 		
 		pinctrl-names = "default";
 		pinctrl-0 = <&pmx_mdss_default>;
@@ -138,25 +116,6 @@
 &dsi0_out {
 	remote-endpoint = <&panel_in>;
 	data-lanes = <0 1 2 3>;
-};
-
-&wcd_codec {
-	qcom,micbias1-ext-cap;
-	qcom,hphl-jack-type-normally-open;
-
-	// I couldn't verify these two downstream:
-	//qcom,mbhc-vthreshold-low = <75 150 237 450 500>;
-	//qcom,mbhc-vthreshold-high = <75 150 237 450 500>;
-};
-
-&camss {
-	status = "okay";
-	compatible = "qcom,sdm450-camss";
-	vdda-supply = <&pm8953_s3>;
-
-	ports {
-		// empty for now (TODO: fill in later)
-	};
 };
 
 &sdhc_1 {
@@ -192,32 +151,8 @@
 	vdddig-supply = <&pm8953_l5>;
 };
 
-&lpass {
-	status = "okay";
-};
-
 &tlmm {
 	gpio-reserved-ranges = <95 5>, <111 1>, <126 1>;
-
-	ts_reset: ts-reset-pins {
-		pins = "gpio64";
-		function = "gpio";
-		drive-strength = <2>;
-		bias-pull-up;
-	};
-
-	touch_int_default: touch-int-default-pins {
-		pins = "gpio65";
-		function = "gpio";
-		bias-disable;
-	};
-
-	touch_int_suspend: touch-int-suspend-pins {
-		pins = "gpio65";
-		function = "gpio";
-		drive-strength = <2>;
-		bias-pull-up;
-	};
 
 	pmx_mdss_default: pmx-mdss-default-pins {
 		pins = "gpio61", "gpio59";
@@ -241,47 +176,12 @@
 		bias-pull-up;
 	};
 
-	ts_int_suspend: ts-int-suspend-pins {
-		pins = "gpio65";
-		function = "gpio";
-		drive-strength = <2>;
-		bias-pull-down;
-	};
-
 	ts_reset_active: ts-reset-active-pins {
 		pins = "gpio64";
 		function = "gpio";
 		drive-strength = <0x08>;
 		bias-pull-up;
 	};
-
-	ts_reset_suspend: ts-reset-suspend-pins {
-		pins = "gpio64";
-		function = "gpio";
-		drive-strength = <2>;
-		bias-pull-down;
-	};
-
-	nfc_irq_default: nfc-irq-pins {
-		pins = "gpio17";
-		bias-pull-down;
-		drive-strength = <2>;
-	};
-
-	nfc_pwr_default: nfc-pwr-pins {
-		pins = "gpio16";
-		bias-pull-down;
-		output-low;
-		drive-strength = <2>;
-	};
-
-	nfc_firm_default: nfc-firm-pins {
-		pins = "gpio62";
-		bias-pull-down;
-		output-low;
-		drive-strength = <2>;
-	};
-
 };
 
 &usb3 {
