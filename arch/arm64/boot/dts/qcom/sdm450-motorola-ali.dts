@@ -62,23 +62,17 @@
 &i2c_3 {
 	status = "okay";
 
-	focaltech@38 {
-		compatible = "edt,edt-ft5406", "edt,edt-ft5x06"; // the touchscreen is actually ft5446, but the ft5406 driver works.
+	touchscreen@38 {
+		compatible = "edt,edt-ft5406"; // the touchscreen is actually ft5446, but the ft5406 driver works.
 		reg = <0x38>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <65 IRQ_TYPE_EDGE_FALLING>;
 		vcc-supply = <&pm8953_l10>;
 
-		reset-gpios = <&tlmm 64 GPIO_ACTIVE_LOW>;
-
-		/* pins used by touchscreen */
-		pinctrl-names = "default"; //,"sleep", "pmx_ts_release";
+		pinctrl-names = "default";
 		pinctrl-0 = <&ts_int_active &ts_reset_active>;
-
-		// Same as goodix touchscreen, don't know if this is needed
-		// pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
-		// pinctrl-2 = <&ts_release>;
-
+		
+		reset-gpios = <&tlmm 64 GPIO_ACTIVE_LOW>;
 		touchscreen-size-x = <1080>;
 		touchscreen-size-y = <2160>;
 	};
