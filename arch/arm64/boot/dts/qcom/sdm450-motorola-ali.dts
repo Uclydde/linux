@@ -16,11 +16,6 @@
   qcom,msm-id = <338 0>;
   qcom,board-id = <0x41 0xb1a0 0x42 0xb1a0>, <0x43 0xc100>, <0x42 0xb1b0>, <0x43 0xc200 0x44 0xc200>, <0x42 0xb200 0x43 0xb200>;
 
-  aliases {
-  	panel = &panel;
-  };
-
-
   reserved-memory {
 	/delete-node/other_ext_region@85b00000;
 
@@ -114,20 +109,17 @@
 };
 
 &dsi0 {
-	panel: panel@0 {
-		compatible = "tianma,tl057fvxp01", "tianma-tl057fvxp01", "tianma,565-v0", "qcom,mipi_mot_vid_tianma_1080p_565", "qcom,mdss_dsi_mot_tianma_565_1080p_vid_v0", "qcom,mdss_dsi_mot_dummy_qhd_video", "qcom,mipi_mot_video_dummy_qhd", "qcom,mot_tianma_565_1080p_vid_v0", "qcom,mdss-dsi-panel", "tianma,mipi_mot_vid_tianma_1080p_565", "tianma,mdss_dsi_mot_tianma_565_1080p_vid_v0", "tianma,mot_tianma_565_1080p_vid_v0";
-
+	panel@0 {
+		compatible = "tianma,tl057fvxp01";
 		reg = <0>;
 
 		supply-names = "vsp", "vsn";
-
+		reset-gpios = <&tlmm 61 GPIO_ACTIVE_LOW>;
+		backlight = <&pmi8950_wled>;
+		
 		pinctrl-names = "default";
 		pinctrl-0 = <&pmx_mdss_default>;
 		pinctrl-1 = <&pmx_mdss_sleep>;
-
-		backlight = <&pmi8950_wled>;
-
-		reset-gpios = <&tlmm 61 GPIO_ACTIVE_LOW>;
 
 		port {
 			panel_in: endpoint {
@@ -138,8 +130,8 @@
 };
 
 &dsi0_out {
-	data-lanes = <0 1 2 3>;
 	remote-endpoint = <&panel_in>;
+	data-lanes = <0 1 2 3>;
 };
 
 &wcd_codec {
