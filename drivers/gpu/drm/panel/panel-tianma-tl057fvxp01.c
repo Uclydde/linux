@@ -5,6 +5,7 @@
  * Generated with linux-mdss-dsi-panel-driver-generator from vendor device tree
  */
 
+#include <linux/gpio/consumer.h>
 #include <linux/delay.h>
 #include <linux/module.h>
 #include <linux/of.h>
