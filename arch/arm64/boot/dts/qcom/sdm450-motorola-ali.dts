@@ -6,6 +6,7 @@
 #include "msm8953.dtsi"
 #include "pm8953.dtsi"
 #include "pmi8950.dtsi"
+#include <dt-bindings/leds/common.h>
 
 / {
   model = "ali";
