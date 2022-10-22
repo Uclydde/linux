@@ -48,6 +48,10 @@
   };
 };
 
+&atc_leds {
+	status = "okay";
+};
+
 &i2c_3 {
 	status = "okay";
 
