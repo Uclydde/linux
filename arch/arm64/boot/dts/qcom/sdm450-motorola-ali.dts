@@ -6,7 +6,6 @@
 #include "msm8953.dtsi"
 #include "pm8953.dtsi"
 #include "pmi8950.dtsi"
-#include <dt-bindings/leds/common.h>
 
 / {
   model = "ali";
@@ -91,8 +90,7 @@
 		reg = <0>;
 
 		backlight = <&pmi8950_wled>;
-		vsp-supply = <&lab_vreg>;
-		vsn-supply = <&ibb_vreg>;
+		supply-names = "vsp", "vsn";
 		reset-gpios = <&tlmm 61 GPIO_ACTIVE_LOW>;
 
 		pinctrl-names = "default";
