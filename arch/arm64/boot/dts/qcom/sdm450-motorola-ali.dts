@@ -89,10 +89,11 @@
 		reg = <0>;
 		
 		backlight = <&pmi8950_wled>;
-		supply-names = "vsp", "vsn";
+		vsp-supply = <&lab_vreg>;
+		vsn-supply = <&ibb_vreg>;
 		reset-gpios = <&tlmm 61 GPIO_ACTIVE_LOW>;
 
-		pinctrl-names = "default"; // downstream, it is "pmx_ts_active", "pmx_ts_suspend". this value is just a guess (xiaomi-daisy uses focaltech, and puts "default" here.)
+		pinctrl-names = "default";
 		pinctrl-0 = <&pmx_mdss_default>;
 		pinctrl-1 = <&pmx_mdss_sleep>;
 
