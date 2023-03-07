@@ -5,11 +5,10 @@
  * Generated with linux-mdss-dsi-panel-driver-generator from vendor device tree
  */
 
-#include <linux/gpio/consumer.h>
 #include <linux/delay.h>
+#include <linux/gpio/consumer.h>
 #include <linux/module.h>
 #include <linux/of.h>
-#include <linux/regulator/consumer.h>
 
 #include <video/mipi_display.h>
 
@@ -20,7 +19,6 @@
 struct tianma_tl057fvxp01 {
 	struct drm_panel panel;
 	struct mipi_dsi_device *dsi;
-	struct regulator_bulk_data supplies[2];
 	struct gpio_desc *reset_gpio;
 	bool prepared;
 };
@@ -62,18 +60,10 @@ static int tianma_tl057fvxp01_on(struct tianma_tl057fvxp01 *ctx)
 	dsi_dcs_write_seq(dsi, 0xb3, 0x04, 0x38, 0x08, 0x70);
 	dsi_dcs_write_seq(dsi, 0x00, 0x00);
 	dsi_dcs_write_seq(dsi, 0xff, 0xff, 0xff, 0xff);
-	
-	ret = mipi_dsi_dcs_set_tear_on(dsi, MIPI_DSI_DCS_TEAR_MODE_VBLANK);
-	if (ret < 0) {
-		dev_err(dev, "Failed to set tear on: %d\n", ret);
-		return ret;
-	}
-	
-	ret = mipi_dsi_dcs_set_display_brightness(dsi, 0x08cc);
-	if (ret < 0) {
-		dev_err(dev, "Failed to set display brightness: %d\n", ret);
-		return ret;
-	}
+	dsi_dcs_write_seq(dsi, 0x35, 0x00);
+	dsi_dcs_write_seq(dsi, 0x51, 0xcc, 0x08);
+	dsi_dcs_write_seq(dsi, 0x53, 0x2c);
+	dsi_dcs_write_seq(dsi, 0x55, 0x01);
 
 	ret = mipi_dsi_dcs_exit_sleep_mode(dsi);
 	if (ret < 0) {
@@ -123,12 +113,6 @@ static int tianma_tl057fvxp01_prepare(struct drm_panel *panel)
 
 	if (ctx->prepared)
 		return 0;
-	
-	ret = regulator_bulk_enable(ARRAY_SIZE(ctx->supplies), ctx->supplies);
-	if (ret < 0) {
-		dev_err(dev, "Failed to enable regulators: %d\n", ret);
-		return ret;
-	}	
 
 	tianma_tl057fvxp01_reset(ctx);
 
@@ -136,7 +120,6 @@ static int tianma_tl057fvxp01_prepare(struct drm_panel *panel)
 	if (ret < 0) {
 		dev_err(dev, "Failed to initialize panel: %d\n", ret);
 		gpiod_set_value_cansleep(ctx->reset_gpio, 1);
-		regulator_bulk_disable(ARRAY_SIZE(ctx->supplies), ctx->supplies);
 		return ret;
 	}
 
@@ -158,7 +141,6 @@ static int tianma_tl057fvxp01_unprepare(struct drm_panel *panel)
 		dev_err(dev, "Failed to un-initialize panel: %d\n", ret);
 
 	gpiod_set_value_cansleep(ctx->reset_gpio, 1);
-	regulator_bulk_disable(ARRAY_SIZE(ctx->supplies), ctx->supplies);
 
 	ctx->prepared = false;
 	return 0;
@@ -213,13 +195,6 @@ static int tianma_tl057fvxp01_probe(struct mipi_dsi_device *dsi)
 	if (!ctx)
 		return -ENOMEM;
 
-	ctx->supplies[0].supply = "vsp";
-	ctx->supplies[1].supply = "vsn";
-	ret = devm_regulator_bulk_get(dev, ARRAY_SIZE(ctx->supplies),
-				      ctx->supplies);
-	if (ret < 0)
-		return dev_err_probe(dev, ret, "Failed to get regulators\n");
-	
 	ctx->reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);
 	if (IS_ERR(ctx->reset_gpio))
 		return dev_err_probe(dev, PTR_ERR(ctx->reset_gpio),
@@ -267,7 +242,7 @@ static int tianma_tl057fvxp01_remove(struct mipi_dsi_device *dsi)
 }
 
 static const struct of_device_id tianma_tl057fvxp01_of_match[] = {
-	{ .compatible = "tianma,tl057fvxp01" },
+	{ .compatible = "tianma,tl057fvxp01" }, // FIXME
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, tianma_tl057fvxp01_of_match);
