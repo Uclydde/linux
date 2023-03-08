@@ -145,26 +145,6 @@
 &tlmm {
 	gpio-reserved-ranges = <95 5>, <111 1>, <126 1>;
 
-	ts_reset: ts-reset-pins {
-		pins = "gpio64";
-		function = "gpio";
-		drive-strength = <2>;
-		bias-pull-up;
-	};
-
-	touch_int_default: touch-int-default-pins {
-		pins = "gpio65";
-		function = "gpio";
-		bias-disable;
-	};
-
-	touch_int_suspend: touch-int-suspend-pins {
-		pins = "gpio65";
-		function = "gpio";
-		drive-strength = <2>;
-		bias-pull-up;
-	};
-
 	pmx_mdss_default: pmx-mdss-default-pins {
 		pins = "gpio61", "gpio59";
 		function = "gpio";
@@ -187,59 +167,51 @@
 		bias-pull-up;
 	};
 
-	ts_int_suspend: ts-int-suspend-pins {
-		pins = "gpio65";
-		function = "gpio";
-		drive-strength = <2>;
-		bias-pull-down;
-	};
-
 	ts_reset_active: ts-reset-active-pins {
 		pins = "gpio64";
 		function = "gpio";
 		drive-strength = <0x08>;
 		bias-pull-up;
 	};
-
-	ts_reset_suspend: ts-reset-suspend-pins {
-		pins = "gpio64";
-		function = "gpio";
-		drive-strength = <2>;
-		bias-pull-down;
-	};
-
-	nfc_irq_default: nfc-irq-pins {
-		pins = "gpio17";
-		bias-pull-down;
-		drive-strength = <2>;
-	};
-
-	nfc_pwr_default: nfc-pwr-pins {
-		pins = "gpio16";
-		bias-pull-down;
-		output-low;
-		drive-strength = <2>;
-	};
-
-	nfc_firm_default: nfc-firm-pins {
-		pins = "gpio62";
-		bias-pull-down;
-		output-low;
-		drive-strength = <2>;
-	};
-
 };
 
 &usb3 {
 	status = "okay";
 };
 
+&usb3_dwc3 {
+	dr_mode = "peripheral";
+};
+
+&hsusb_phy {
+	status = "okay";
+
+	vdd-supply = <&pm8953_l3>;
+	vdda-pll-supply = <&pm8953_l7>;
+	vdda-phy-dpdm-supply = <&pm8953_l13>;
+};
+
+&pm8953_resin {
+	status = "okay";
+	linux,code = <KEY_VOLUMEDOWN>;
+};
 
 &rpm_requests {
 	pm8953-regulators {
 		compatible = "qcom,rpm-pm8953-regulators";
 
-		// TODO supplies
+		vdd_s1-supply = <&vph_pwr>;
+		vdd_s2-supply = <&vph_pwr>;
+		vdd_s3-supply = <&vph_pwr>;
+		vdd_s4-supply = <&vph_pwr>;
+		vdd_s5-supply = <&vph_pwr>;
+		vdd_s6-supply = <&vph_pwr>;
+		vdd_s7-supply = <&vph_pwr>;
+		vdd_l1-supply = <&pm8953_s3>;
+		vdd_l2_l3-supply = <&pm8953_s3>;
+		vdd_l4_l5_l6_l7_l16_l19-supply = <&pm8953_s4>;
+		vdd_l8_l11_l12_l13_l14_l15-supply = <&vph_pwr>;
+		vdd_l9_l10_l17_l18_l22-supply = <&vph_pwr>;
 
 		pm8953_s1: s1 {
 			regulator-min-microvolt = <795000>;
